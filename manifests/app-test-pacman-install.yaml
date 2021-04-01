@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pacman
+spec:
+  replicas: 2
+  minReadySeconds: 5
+  selector:
+    matchLabels:
+      app: pacman
+  template:
+    metadata:
+      labels:
+        ver: "1"
+        app: pacman
+        env: dev      
+    spec:
+      containers:
+      - name: pacman
+        image: gcr.io/emeagso/pacman-nginx-app:latest
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pacman
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: pacman
+  type: LoadBalancer

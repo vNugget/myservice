@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: metallb-system
+  name: config
+data:
+  config: |
+    address-pools:
+    - name: my-ip-space
+      protocol: layer2
+      addresses:
+      #todo: replace the line below with your cidr:
+      - 192.168.1.240/28
+      #* alternatively, you can also specify a range of IPs (delete the cidr or range if you only need one of them):
+      - 192.168.1.245-192.168.1.250
