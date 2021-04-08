@@ -1,0 +1,17 @@
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: network-service-owner
+  #namespace: dev
+  #labels:
+    #rbac.example.com/aggregate-to-base-role: "true"
+rules:
+  - apiGroups: ["networking.k8s.io"]
+    resources:
+      - networkpolicies
+    verbs: ["*"]
+  - apiGroups: ["crd.projectcalico.org"]
+    resources:
+      - networkpolicies
+      - networksets
+    verbs: ["*"]
