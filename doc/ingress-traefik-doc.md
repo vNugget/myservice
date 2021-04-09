@@ -31,11 +31,11 @@ The domain name **xpert-services.eu** is hosted on Digital Ocean, in this guide,
 
     The following 5 files will be used to install and configure Traefik and a test application to verify if the TLS certificate was generated correctly
 
-     - **metallb-configmap.yaml**: MetalLB configuration file used for addresses allocation
-     - **traefik-crd.yaml** : custom ressources definition and cluster role required for Traefik
-     - **traefik-deployment.yaml**: Traefik and a test application deployment file
-     - **traefik-service.yaml**: exposing Traefik service through a LoadBlancer and the test      application (whoami)
-     - **traefik-ingressroutes.yaml**: this file describe the routing from the domain name into      the internal services hosted on Kubernetes/Karbon  
+     - **[metallb-configmap.yaml](../manifests/metallb-configmap.yaml)**: MetalLB configuration file used for addresses allocation
+     - **[traefik-crd.yaml](../manifests/traefik-crd.yaml)** : custom ressources definition and cluster role required for Traefik
+     - **[traefik-deployment.yaml](../manifests/traefik-deployment.yaml)**: Traefik and a test application deployment file
+     - **[traefik-service.yaml](../manifests/traefik-service.yaml)**: exposing Traefik service through a LoadBlancer and the test      application (whoami)
+     - **[traefik-ingressroutes.yaml](../manifests/traefik-ingressroutes.yaml)**: this file describe the routing from the domain name into      the internal services hosted on Kubernetes/Karbon  
 
 ## Implementation  
 
