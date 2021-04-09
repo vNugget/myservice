@@ -26,7 +26,7 @@ The first section of this guide will give a breif description of different RBAC 
 
 Use of the described roles below is not a hard requirement, they are given as an example.
 
-You will use a ficticious user named **salah_user**.
+You will use a fictitious user named **salah_user**.
 
 ## RBAC Roles and Role Binding
 
