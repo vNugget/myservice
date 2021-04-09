@@ -46,6 +46,8 @@ From kubernetes.io documentation:
 
 The assumption here is that you have some users on your Active Directory, you will use Role mapping from Prism Central to map you user **salah_user** into the **viewer** role as shown on the screenshot below:
 
+![Prism Central role mapping](assets/images/pc-role-mapping.png)
+
 The next steps is to generate a **kubeconfig** file for your user, this can be done using Prism Central web interface, API or karbonctl, in our case, you will be using karbonctl.
 
 > Note: Kubeconfig is valid for 24 hours once pulled. This is a security feature by design in Karbon. A fresh and valid kubeconfig can be obtained using a cronjob that use karbonctl to retrieve the kubeconfig file.
