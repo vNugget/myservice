@@ -39,12 +39,14 @@ jobs:
 
       - name: Apply yaml manifests
         env:
-          REPO_NAME: ${{GITHUB_REPOSITORY}}
+          REPO_NAME: $GITHUB_REPOSITORY
 
         run: |
           echo Applying yaml manifests
+          echo $REPO_NAME
           echo ${REPO_NAME#*"nutanixservices/"*}
-          ./kubectl apply $(ls rbac*.yaml | awk ' { print " -f $REPO_NAME/$REPO_NAME/manifets/"$1 } ') --kubeconfig=kubeconfig
+          echo $REPO_NAME/$REPO_NAME/manifets/
+          #./kubectl apply $(ls rbac*.yaml | awk ' { print " -f $REPO_NAME/$REPO_NAME/manifets/"$1 } ') --kubeconfig=kubeconfig
 
   clean:
     runs-on: self-hosted
@@ -54,6 +56,6 @@ jobs:
       - name: Cleaning
         run: |
           echo Removing yaml manifests
-          ./kubectl delete $(ls rbac*.yaml | awk ' { print " -f $REPO_NAME/$REPO_NAME/manifets/"$1 } ') --kubeconfig=kubeconfig
+          #./kubectl delete $(ls rbac*.yaml | awk ' { print " -f $REPO_NAME/$REPO_NAME/manifets/"$1 } ') --kubeconfig=kubeconfig
 
 
