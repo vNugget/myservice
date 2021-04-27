@@ -43,7 +43,7 @@ jobs:
           echo $MANIFESTS
           pwd
           ls
-          ./kubectl apply $(ls $MANIFESTSrbac*.yaml | awk ' { print " -f $MANIFESTS"$1 } ') --kubeconfig=kubeconfig
+          ./kubectl apply $(ls ${MANIFESTS}rbac*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
 
   clean:
     runs-on: self-hosted
@@ -53,6 +53,6 @@ jobs:
       - name: Cleaning
         run: |
           echo Removing yaml manifests
-          ./kubectl delete $(ls $MANIFESTSrbac*.yaml | awk ' { print " -f $MANIFESTS"$1 } ') --kubeconfig=kubeconfig
+          ./kubectl delete $(ls ${MANIFESTS}rbac*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
 
 
