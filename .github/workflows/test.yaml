@@ -23,7 +23,7 @@ jobs:
             echo Kubectl installed
 
       - name: Running cluster connectivity test
-        run: echo ${{sercret.KUBECONFIG}} | base64 -d > kubeconfig
+        run: echo ${{secret.KUBECONFIG}} | base64 -d > kubeconfig
         run: ./kubectl get node --kubeconfig=kubeconfig
 
   build:
