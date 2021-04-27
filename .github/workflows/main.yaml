@@ -12,13 +12,13 @@ env:
   MANIFESTS: "manifests/"
 
 jobs:
+  # Download, install and configure Kubectl
   prepare:    
     runs-on: self-hosted
-
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        
+
       - name: Get kubectl
         run: |
             curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -26,28 +26,26 @@ jobs:
             echo "$(<kubectl.sha256) kubectl" | sha256sum --check
             chmod +x kubectl
             echo Kubectl installed
-
+  # Apply all rbac manifests
+  apply:
+    runs-on: self-hosted
+    needs: prepare
+    steps:
       - name: Running cluster connectivity test
         env:
           KUBECONFIG: ${{secrets.KUBECONFIG}}
         run: |
             echo $KUBECONFIG | base64 -d > kubeconfig
-            pwd
-            ls
             ./kubectl get node --kubeconfig=kubeconfig
 
       - name: Apply yaml manifests
         run: |
           echo Applying yaml manifests
-          echo $MANIFESTS
-          pwd
-          ls
           ./kubectl apply $(ls ${MANIFESTS}rbac*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
-
+  # Remove all rbac manifests
   clean:
     runs-on: self-hosted
-    needs: prepare
-
+    needs: apply
     steps:
       - name: Cleaning
         run: |
