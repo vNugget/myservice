@@ -1,7 +1,6 @@
 # This is a WIP
 
-name: CI
- 
+name: CICD
 on:
   push:
     branches:
@@ -10,7 +9,6 @@ on:
   workflow_dispatch:
 env:
   MANIFESTS: "manifests/"
-
 jobs:
   # Download, install and configure Kubectl
   prepare:    
@@ -26,10 +24,22 @@ jobs:
             echo "$(<kubectl.sha256) kubectl" | sha256sum --check
             chmod +x kubectl
             echo Kubectl installed
+  # Manifests should be validated 
+  verify:
+    runs-on: self-hosted
+    needs: prepare
+    steps:
+      - name: Validating manifests against best practices
+        run: |
+          echo Getting Kubeval
+          wget https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz
+          tar xf kubeval-linux-amd64.tar.gz;rm -f kubeval-linux-amd64.tar.gz
+          echo Validating manifests using Kubeval
+          ./kubeval --ignore-missing-schemas manifests/rbac*.yaml
   # Apply all rbac manifests
   apply:
     runs-on: self-hosted
-    needs: prepare
+    needs: verify
     steps:
       - name: Running cluster connectivity test
         env:
