@@ -1,0 +1,68 @@
+# This is a WIP
+
+name: CICD
+on:
+  push:
+    branches:
+      - salah
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+env:
+  MANIFESTS: "manifests/"
+  # change this to match the version of K8S deployed by Karbon, major and minor only!
+  # see https://github.com/instrumenta/kubernetes-json-schema for inputs
+  K8S_API_VERSION: "1.17.0" 
+jobs:
+  # Download, install and configure Kubectl
+  prepare:    
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Get kubectl
+        run: |
+            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+            curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+            echo "$(<kubectl.sha256) kubectl" | sha256sum --check
+            chmod +x kubectl
+            echo Kubectl installed
+  # Manifests should be validated 
+  verify:
+    runs-on: self-hosted
+    needs: prepare
+    steps:
+      - name: Validating manifests against kubernetes/Karbon API
+        run: |
+          echo Getting Kubeval
+          wget https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz
+          tar xf kubeval-linux-amd64.tar.gz;rm -f kubeval-linux-amd64.tar.gz
+          echo Validating manifests using Kubeval
+          ./kubeval --ignore-missing-schemas --kubernetes-version $K8S_API_VERSION manifests/rbac*.yaml
+  # Apply all rbac manifests
+  apply:
+    runs-on: self-hosted
+    needs: verify
+    steps:
+      - name: Running cluster connectivity test
+        env:
+          KUBECONFIG: ${{secrets.KUBECONFIG}}
+        run: |
+            echo $KUBECONFIG | base64 -d > kubeconfig
+            ./kubectl get node --kubeconfig=kubeconfig
+
+      - name: Apply yaml manifests
+        run: |
+          echo Applying yaml manifests
+          ./kubectl apply $(ls ${MANIFESTS}rbac*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
+  # Remove all rbac manifests
+  clean:
+    runs-on: self-hosted
+    needs: apply
+    steps:
+      - name: Cleaning
+        run: |
+          echo Removing yaml manifests
+          ./kubectl delete $(ls ${MANIFESTS}rbac*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
+
+
