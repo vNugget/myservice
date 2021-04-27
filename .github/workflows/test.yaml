@@ -23,8 +23,9 @@ jobs:
             echo Kubectl installed
 
       - name: Running cluster connectivity test
-        run: echo ${{secrets.KUBECONFIG}} | base64 -d > kubeconfig
-        run: ./kubectl get node --kubeconfig=kubeconfig
+        run: |
+            echo ${{secrets.KUBECONFIG}} | base64 -d > kubeconfig
+            ./kubectl get node --kubeconfig=kubeconfig
 
   build:
     runs-on: self-hosted
