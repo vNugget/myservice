@@ -32,7 +32,7 @@ jobs:
             ls
             ./kubectl get node --kubeconfig=kubeconfig
 
-      - uses: actions/checkout@v2
+
 
       - name: Apply yaml manifests
         env:
