@@ -44,9 +44,9 @@ jobs:
         run: |
           echo Applying yaml manifests
           echo $REPO_NAME
-          echo ${REPO_NAME#*"nutanixservices/"*}
-          echo $REPO_NAME/$REPO_NAME/manifets/
-          #./kubectl apply $(ls rbac*.yaml | awk ' { print " -f $REPO_NAME/$REPO_NAME/manifets/"$1 } ') --kubeconfig=kubeconfig
+          REPO_DIR=${REPO_NAME#*"nutanixservices/"*}
+          echo $REPO_DIR/$REPO_DIR/manifets/
+          ./kubectl apply $(ls rbac*.yaml | awk ' { print " -f $REPO_DIR/$REPO_DIR/manifets/"$1 } ') --kubeconfig=kubeconfig
 
   clean:
     runs-on: self-hosted
@@ -56,6 +56,6 @@ jobs:
       - name: Cleaning
         run: |
           echo Removing yaml manifests
-          #./kubectl delete $(ls rbac*.yaml | awk ' { print " -f $REPO_NAME/$REPO_NAME/manifets/"$1 } ') --kubeconfig=kubeconfig
+          ./kubectl delete $(ls rbac*.yaml | awk ' { print " -f $REPO_DIR/$REPO_DIR/manifets/"$1 } ') --kubeconfig=kubeconfig
 
 
