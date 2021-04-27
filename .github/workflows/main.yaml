@@ -65,6 +65,7 @@ jobs:
           echo Removing yaml manifests
           ./kubectl delete $(ls ${MANIFESTS}rbac*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
   slack:
+    runs-on: self-hosted
     steps:
       - name: Report Status
         if: always()
