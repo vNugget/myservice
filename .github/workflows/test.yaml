@@ -38,9 +38,12 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Apply yaml manifests
+
         run: |
           echo Applying yaml manifests
-          ./kubectl apply $(ls rbac*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
+          echo $GITHUB_REF
+          echo $GITHUB_REPOSITORY
+          #./kubectl apply $(ls rbac*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
 
   clean:
     runs-on: self-hosted
@@ -50,6 +53,6 @@ jobs:
       - name: Cleaning
         run: |
           echo Removing yaml manifests
-          ./kubectl delete $(ls rbac*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
+          #./kubectl delete $(ls rbac*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
 
 
