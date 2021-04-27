@@ -8,9 +8,10 @@ on:
       - salah
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+env:
+  MANIFESTS: "manifests/"
 
 jobs:
-
   prepare:    
     runs-on: self-hosted
 
@@ -32,12 +33,10 @@ jobs:
             ls
             ./kubectl get node --kubeconfig=kubeconfig
 
-
+      - name: Checkout
+        uses: actions/checkout@v2
 
       - name: Apply yaml manifests
-        env:
-          MANIFESTS: "manifests/"
-
         run: |
           echo Applying yaml manifests
           echo $MANIFESTS
