@@ -28,6 +28,8 @@ jobs:
           KUBECONFIG: ${{secrets.KUBECONFIG}}
         run: |
             echo $KUBECONFIG | base64 -d > kubeconfig
+            pwd
+            ls
             ./kubectl get node --kubeconfig=kubeconfig
 
   build:
@@ -43,6 +45,8 @@ jobs:
 
         run: |
           echo Applying yaml manifests
+          pwd
+          ls
           ./kubectl apply $(ls $MANIFESTSrbac*.yaml | awk ' { print " -f $MANIFESTS"$1 } ') --kubeconfig=kubeconfig
 
   clean:
