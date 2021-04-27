@@ -37,27 +37,19 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Run a one-line script
-        run: echo Hello, world!
-
-      - name: Run a multi-line script
+      - name: Apply yaml manifests
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
-  test:
+          echo Applying yaml manifests
+          ./kubectl apply $(ls rbac*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
 
+  clean:
     runs-on: self-hosted
     needs: build
 
     steps:
-      - name: Testing
-        run: echo We are testing here
-  clean:
-    runs-on: self-hosted
-    needs: test
-
-    steps:
       - name: Cleaning
-        run: echo We are cleaning here
+        run: |
+          echo Removing yaml manifests
+          ./kubectl delete $(ls rbac*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
 
 
