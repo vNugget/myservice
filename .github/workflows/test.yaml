@@ -39,7 +39,7 @@ jobs:
 
       - name: Apply yaml manifests
         env:
-          REPO_NAME: $GITHUB_REPOSITORY
+          REPO_NAME: ${{GITHUB_REPOSITORY}}
 
         run: |
           echo Applying yaml manifests
