@@ -47,7 +47,7 @@ jobs:
 
   clean:
     runs-on: self-hosted
-    needs: build
+    needs: prepare
 
     steps:
       - name: Cleaning
