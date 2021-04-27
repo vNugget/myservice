@@ -32,11 +32,6 @@ jobs:
             ls
             ./kubectl get node --kubeconfig=kubeconfig
 
-  build:
-    runs-on: self-hosted
-    needs: prepare
-
-    steps:
       - uses: actions/checkout@v2
 
       - name: Apply yaml manifests
@@ -45,6 +40,7 @@ jobs:
 
         run: |
           echo Applying yaml manifests
+          echo $MANIFESTS
           pwd
           ls
           ./kubectl apply $(ls $MANIFESTSrbac*.yaml | awk ' { print " -f $MANIFESTS"$1 } ') --kubeconfig=kubeconfig
