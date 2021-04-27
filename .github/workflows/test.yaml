@@ -27,7 +27,7 @@ jobs:
         env:
           KUBECONFIG: ${{secrets.KUBECONFIG}}
         run: |
-            echo $KUBECONFIG | base64 -d > kubeconfig
+            echo $KUBECONFIG > kubeconfig
             ./kubectl get node --kubeconfig=kubeconfig
 
   build:
