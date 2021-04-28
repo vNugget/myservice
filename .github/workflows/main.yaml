@@ -46,15 +46,13 @@ jobs:
     steps:
       - name: Running cluster connectivity test
         env:
-          KUBECONFIG: ${{secrets.KUBECONFIG}}
-        run: |
-            echo $KUBECONFIG | base64 -d > kubeconfig
-            ./kubectl get node --kubeconfig=kubeconfig
+          KUBECTL_TOKEN: ${{secrets.KUBECTL_TOKEN}}
+        run: ./kubectl get node --token=KUBECTL_TOKEN
 
       - name: Apply yaml manifests
         run: |
           echo Applying yaml manifests
-          ./kubectl apply $(ls ${MANIFESTS}rbac*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
+          ./kubectl apply $(ls ${MANIFESTS}rbac*.yaml | awk ' { print " -f " $1 } ') --token=KUBECTL_TOKEN
   # Remove all rbac manifests
   clean:
     runs-on: self-hosted
@@ -63,7 +61,7 @@ jobs:
       - name: Cleaning
         run: |
           echo Removing yaml manifests
-          ./kubectl delete $(ls ${MANIFESTS}rbac*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
+          ./kubectl delete $(ls ${MANIFESTS}rbac*.yaml | awk ' { print " -f " $1 } ') --token=KUBECTL_TOKEN
 #  slack:
  #   runs-on: self-hosted
   #  steps:
