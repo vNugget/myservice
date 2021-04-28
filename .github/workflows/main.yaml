@@ -64,16 +64,16 @@ jobs:
         run: |
           echo Removing yaml manifests
           ./kubectl delete $(ls ${MANIFESTS}rbac*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
-#  slack:
- #   runs-on: self-hosted
-  #  steps:
-   #   - name: Report Status
-    #    if: always()
-     #   uses: ravsamhq/notify-slack-action@master
-      #  with:
-       #   status: ${{ job.status }}
-        #  notify_when: 'success,failure,warnings'
-        #env:
-         # SLACK_WEBHOOK_URL: ${{ secrets.SLACK_INCOMING_WEBHOOK }}
+  slack:
+    runs-on: self-hosted
+    steps:
+      - name: Report Status
+        if: always()
+        uses: ravsamhq/notify-slack-action@master
+        with:
+          status: ${{ job.status }}
+          notify_when: 'success,failure,warnings'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_INCOMING_WEBHOOK }}
 
 
