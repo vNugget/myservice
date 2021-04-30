@@ -95,11 +95,14 @@ jobs:
           echo Removing Metallb resources
           ./kubectl delete ns metallb-system --kubeconfig=kubeconfig
           echo Removing Traefik resources
-        #./kubectl delete $(ls ${MANIFESTS}traefik*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
+          #./kubectl delete $(ls ${MANIFESTS}traefik*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
           ./kubectl delete secret do-auth-token
           echo Removing hosts records
           sudo sed -i '/xpert-services.eu$/d' /etc/hosts
 
- 
+  # manually cleaning resources
+  #./kubectl delete $(ls manifests/*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
+  #./kubectl --kubeconfig=kubeconfig  delete ns metallb-system
+  #./kubectl --kubeconfig=kubeconfig  delete secret do-auth-token
 
 
