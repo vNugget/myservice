@@ -98,6 +98,7 @@ jobs:
   clean:
     runs-on: self-hosted
     needs: testing
+    steps:
       - name: Apply yaml manifests
         run: |
           echo Applying yaml manifests
