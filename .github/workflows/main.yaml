@@ -2,8 +2,6 @@
 
 # jq need to be installed on the runner
 
-
-
 name: CICD
 on:
   push:
@@ -12,9 +10,7 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-
 ############### Start var config #########
-
 
 env:
   MANIFESTS: "manifests/"
@@ -25,7 +21,6 @@ env:
   # change it to the current version
   METALLB_VERSION: "v0.9.6"
 ############### End var config############
-
 
   K8S_API_VERSION: "1.17.0" 
 jobs:
@@ -103,7 +98,7 @@ jobs:
           sleep 60
           #curl --insecure -H "Host: xpert-services.eu" -vvI https://xpert-services.eu/tls
           [[ $(curl --insecure -vvI https://xpert-services.eu/tls 2>&1 | grep "Let's Encrypt") ]] &>/dev/null && echo "App is reachable with valide TLS certificate" || echo "::warning:: App is not reachable with valide TLS certificate"
-# Dev cycle start from here
+  # Dev cycle start from here
   # Remove all manifests
   clean:
     runs-on: self-hosted
@@ -150,8 +145,6 @@ jobs:
   #./kubectl --kubeconfig=kubeconfig  delete ns metallb-system
   #./kubectl --kubeconfig=kubeconfig  delete secret do-auth-token
   #sudo sed -i '/xpert-services.eu$/d' /etc/hosts
-
-          ./kubectl delete $(ls ${MANIFESTS}rbac*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
 
 
 
