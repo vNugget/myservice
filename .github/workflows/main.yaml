@@ -104,9 +104,10 @@ jobs:
           ./kubectl delete secret do-auth-token --kubeconfig=kubeconfig
           echo Removing hosts records
           sudo sed -i '/xpert-services.eu$/d' /etc/hosts
+  # to be modified
   slack:
-    #runs-on: self-hosted
-    #needs: clean
+    runs-on: self-hosted
+    needs: clean
     steps:
       - name: Report Status
         if: always()
