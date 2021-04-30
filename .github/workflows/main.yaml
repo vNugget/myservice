@@ -1,4 +1,5 @@
 # This is a WIP
+# jq need to be installed on the runner
 
 name: CICD
 on:
@@ -59,11 +60,13 @@ jobs:
           ./kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/$METALLB_VERSION/manifests/namespace.yaml --kubeconfig=kubeconfig
           ./kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/$METALLB_VERSION/manifests/metallb.yaml --kubeconfig=kubeconfig
           ./kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)" --kubeconfig=kubeconfig
+          ./kubectl apply -f ${MANIFESTS}metallb-configmap.yaml --kubeconfig=kubeconfig
       - name: Install configure Traefik
         run: |
           echo configure and install Traefik
           ./kubectl create secret generic do-auth-token --from-literal=DO_AUTH_TOKEN=${{secrets.DO_AUTH_TOKEN}} --kubeconfig=kubeconfig
-          ./kubectl apply $(ls ${MANIFESTS}traefik*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
+          ./kubectl apply $(ls ${MANIFESTS}traefik-crd.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
+          ./kubectl apply $(ls ${MANIFESTS}traefik-{d*,i*,s*}.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
       - name: Apply yaml manifests
         run: |
           echo Applying yaml manifests
@@ -76,10 +79,10 @@ jobs:
       - name: Testing app
         run: |
           echo Testing if app is reachable
-          LB_IP=$(kubectl get svc traefik -o json | jq -r '.status.loadBalancer.ingress[0].ip')
-          echo $LB_IP xpert-services.eu >> /etc/hosts
+          LB_IP=$(kubectl get svc traefik -o json | jq -r '.status.loadBalancer.ingress[0].ip' --kubeconfig=kubeconfig)
+          sudo bash -c 'echo $LB_IP xpert-services.eu >> /etc/hosts'
           #echo $LB_IP subdomain.xpert-services.eu >> /etc/hosts
-          [[ $(curl https://xpert-services.eu/tls) ]] &>/dev/null && echo "App reachable with valide TLS certificat" || echo "App is not reachable with valide TLS certificat"
+          [[ $(curl --insecure -vvI https://xpert-services.eu/tls 2>&1 | grep "Let's Encrypt") ]] &>/dev/null && echo "App reachable with valide TLS certificate" || echo "App is not reachable with valide TLS certificate"
   # Remove all rbac manifests
   clean:
     runs-on: self-hosted
@@ -94,6 +97,8 @@ jobs:
           echo Removing Trefik resources
           ./kubectl apply $(ls ${MANIFESTS}traefik*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
           ./kubectl delete secret do-auth-token
+          echo Removing hosts records
+          sudo sed -i '/xpert-services.eu$/d' /etc/hosts
 
  
 
