@@ -95,7 +95,7 @@ jobs:
   # Remove all manifests
   clean:
     runs-on: self-hosted
-    needs: apply
+    needs: testing
     steps:
       - name: Cleaning
         run: |
