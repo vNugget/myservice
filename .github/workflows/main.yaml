@@ -11,7 +11,6 @@ on:
   workflow_dispatch:
 
 ############### Start var config #########
-
 env:
   MANIFESTS: "manifests/"
   # change this to match the version of K8S deployed by Karbon, major and minor only!
@@ -30,7 +29,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
       - name: Get kubectl
         run: |
             curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -49,9 +47,7 @@ jobs:
           wget https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz
           tar xf kubeval-linux-amd64.tar.gz;rm -f kubeval-linux-amd64.tar.gz
           echo Validating manifests using Kubeval
-
           ./kubeval --ignore-missing-schemas --kubernetes-version $K8S_API_VERSION manifests/*.yaml
-
           ./kubeval --ignore-missing-schemas --kubernetes-version $K8S_API_VERSION manifests/rbac*.yaml
 
   # Apply all rbac manifests
@@ -65,7 +61,6 @@ jobs:
         run: |
             echo $KUBECONFIG | base64 -d > kubeconfig
             ./kubectl get node --kubeconfig=kubeconfig
-
       - name: Install configure Metallb
         run: |
           echo configure and install Metallb
@@ -103,7 +98,6 @@ jobs:
   clean:
     runs-on: self-hosted
     needs: testing
-
       - name: Apply yaml manifests
         run: |
           echo Applying yaml manifests
@@ -116,7 +110,6 @@ jobs:
       - name: Cleaning
         run: |
           echo Removing yaml manifests
-
           ./kubectl delete $(ls ${MANIFESTS}*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig || true
           echo Removing Metallb resources
           ./kubectl delete ns metallb-system --kubeconfig=kubeconfig
@@ -145,6 +138,3 @@ jobs:
   #./kubectl --kubeconfig=kubeconfig  delete ns metallb-system
   #./kubectl --kubeconfig=kubeconfig  delete secret do-auth-token
   #sudo sed -i '/xpert-services.eu$/d' /etc/hosts
-
-
-
