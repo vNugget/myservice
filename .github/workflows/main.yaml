@@ -57,7 +57,7 @@ jobs:
           echo configure and install Metallb
           sed -i 's@<CIDR>@'$(cat config.json | jq -r .metallb.cidr)'@g' ${MANIFESTS}metallb-configmap.yaml
           ./kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/$METALLB_VERSION/manifests/namespace.yaml --kubeconfig=kubeconfig
-          ./kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/$METALLB_VERSION/manifests/metallb-configmap.yaml --kubeconfig=kubeconfig
+          ./kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/$METALLB_VERSION/manifests/metallb.yaml --kubeconfig=kubeconfig
           ./kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)" --kubeconfig=kubeconfig
       - name: Install configure Traefik
         run: |
