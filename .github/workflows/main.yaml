@@ -105,8 +105,8 @@ jobs:
           echo Removing hosts records
           sudo sed -i '/xpert-services.eu$/d' /etc/hosts
   slack:
-    runs-on: self-hosted
-    needs: clean
+    #runs-on: self-hosted
+    #needs: clean
     steps:
       - name: Report Status
         if: always()
@@ -114,6 +114,7 @@ jobs:
         with:
           status: ${{ job.status }}
           notify_when: 'success,failure,warnings'
+          footer: 'Sent from GitHub actions nutanixservices org'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_INCOMING_WEBHOOK }}
 
