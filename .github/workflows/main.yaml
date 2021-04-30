@@ -91,7 +91,7 @@ jobs:
       - name: Cleaning
         run: |
           echo Removing yaml manifests
-          ./kubectl delete $(ls ${MANIFESTS}*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig 2>&1
+          ./kubectl delete $(ls ${MANIFESTS}*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig || true
           echo Removing Metallb resources
           ./kubectl delete ns metallb-system --kubeconfig=kubeconfig
           echo Removing Traefik resources
@@ -99,6 +99,17 @@ jobs:
           ./kubectl delete secret do-auth-token
           echo Removing hosts records
           sudo sed -i '/xpert-services.eu$/d' /etc/hosts
+  slack:
+    runs-on: self-hosted
+    steps:
+      - name: Report Status
+        if: always()
+        uses: ravsamhq/notify-slack-action@master
+        with:
+          status: ${{ job.status }}
+          notify_when: 'success,failure,warnings'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_INCOMING_WEBHOOK }}
 
   # manually cleaning resources
   #./kubectl delete $(ls manifests/*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
