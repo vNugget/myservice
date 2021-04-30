@@ -55,7 +55,7 @@ jobs:
       - name: Install configure Metallb
         run: |
           echo configure and install Metallb
-          sed -i 's@<CIDR>@'$(cat config.json | jq -r .metallb.cidr)'@g' metallb-configmap.yaml
+          sed -i 's@<CIDR>@'$(cat config.json | jq -r .metallb.cidr)'@g' ${MANIFESTS}metallb-configmap.yaml
           ./kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/$METALLB_VERSION/manifests/namespace.yaml --kubeconfig=kubeconfig
           ./kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/$METALLB_VERSION/manifests/metallb-configmap.yaml --kubeconfig=kubeconfig
           ./kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)" --kubeconfig=kubeconfig
@@ -79,7 +79,7 @@ jobs:
           LB_IP=$(kubectl get svc traefik -o json | jq -r '.status.loadBalancer.ingress[0].ip')
           echo $LB_IP xpert-services.eu >> /etc/hosts
           #echo $LB_IP subdomain.xpert-services.eu >> /etc/hosts
-          [[ $(curl xpert-services.eu) ]] &>/dev/null && echo "App reachable with valide TLS certificat" || echo "App is not reachable with valide TLS certificat"
+          [[ $(curl https://xpert-services.eu/tls) ]] &>/dev/null && echo "App reachable with valide TLS certificat" || echo "App is not reachable with valide TLS certificat"
   # Remove all rbac manifests
   clean:
     runs-on: self-hosted
