@@ -9,4 +9,4 @@ data:
     - name: default
       protocol: layer2
       addresses:
-      - 10.68.99.6-10.68.99.7
+      - <CIDR>

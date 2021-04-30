@@ -10,6 +10,7 @@ data:
       protocol: layer2
       addresses:
       #todo: replace the line below with your cidr:
-      - 192.168.1.240/28
+      - <CIDR>
       #* alternatively, you can also specify a range of IPs (delete the cidr or range if you only need one of them):
       - 192.168.1.245-192.168.1.250
+      

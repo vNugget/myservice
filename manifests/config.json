@@ -1,0 +1,6 @@
+{
+  "metallb": {
+      "cidr": "10.68.99.6-10.68.99.7",
+      "comment": "cidr can be in X.X.X.X/XX format or ip range X.X.X.X-X.X.X.Y"
+    }
+}

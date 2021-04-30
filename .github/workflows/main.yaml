@@ -11,7 +11,9 @@ env:
   MANIFESTS: "manifests/"
   # change this to match the version of K8S deployed by Karbon, major and minor only!
   # see https://github.com/instrumenta/kubernetes-json-schema for inputs
-  K8S_API_VERSION: "1.17.0" 
+  K8S_API_VERSION: "1.17.0"
+  # change it to the current version
+  METALLB_VERSION: "v0.9.6"
 jobs:
   # Download, install and configure Kubectl
   prepare:    
@@ -50,30 +52,49 @@ jobs:
         run: |
             echo $KUBECONFIG | base64 -d > kubeconfig
             ./kubectl get node --kubeconfig=kubeconfig
-
+      - name: Install configure Metallb
+        run: |
+          echo configure and install Metallb
+          sed -i 's@<CIDR>@'$(cat config.json | jq -r .metallb.cidr)'@g' metallb-configmap.yaml
+          ./kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/$METALLB_VERSION/manifests/namespace.yaml --kubeconfig=kubeconfig
+          ./kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/$METALLB_VERSION/manifests/metallb-configmap.yaml --kubeconfig=kubeconfig
+          ./kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)" --kubeconfig=kubeconfig
+      - name: Install configure Traefik
+        run: |
+          echo configure and install Traefik
+          ./kubectl create secret generic do-auth-token --from-literal=DO_AUTH_TOKEN=${{secrets.DO_AUTH_TOKEN}} --kubeconfig=kubeconfig
+          ./kubectl apply $(ls ${MANIFESTS}traefik*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
       - name: Apply yaml manifests
         run: |
           echo Applying yaml manifests
           ./kubectl apply $(ls ${MANIFESTS}rbac*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
+  # Test app deployment
+  testing:
+    runs-on: self-hosted
+    needs: apply
+    steps:
+      - name: Testing app
+        run: |
+          echo Testing if app is reachable
+          LB_IP=$(kubectl get svc traefik -o json | jq -r '.status.loadBalancer.ingress[0].ip')
+          echo $LB_IP xpert-services.eu >> /etc/hosts
+          #echo $LB_IP subdomain.xpert-services.eu >> /etc/hosts
+          [[ $(curl xpert-services.eu) ]] &>/dev/null && echo "App reachable with valide TLS certificat" || echo "App is not reachable with valide TLS certificat"
   # Remove all rbac manifests
   clean:
     runs-on: self-hosted
-    needs: apply
+    needs: testing
     steps:
       - name: Cleaning
         run: |
           echo Removing yaml manifests
           ./kubectl delete $(ls ${MANIFESTS}rbac*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
-  slack:
-    runs-on: self-hosted
-    steps:
-      - name: Report Status
-        if: always()
-        uses: ravsamhq/notify-slack-action@master
-        with:
-          status: ${{ job.status }}
-          notify_when: 'success,failure,warnings'
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_INCOMING_WEBHOOK }}
+          echo Removing Metallb resources
+          ./kubectl delete ns metallb-system --kubeconfig=kubeconfig
+          echo Removing Trefik resources
+          ./kubectl apply $(ls ${MANIFESTS}traefik*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
+          ./kubectl delete secret do-auth-token
+
+ 
 
 
