@@ -8,6 +8,8 @@ on:
       - salah
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+
+############### Start var config #########
 env:
   MANIFESTS: "manifests/"
   # change this to match the version of K8S deployed by Karbon, major and minor only!
@@ -15,6 +17,8 @@ env:
   K8S_API_VERSION: "1.17.0"
   # change it to the current version
   METALLB_VERSION: "v0.9.6"
+############### End var config############
+
 jobs:
   # Download, install and configure Kubectl
   prepare:    
@@ -82,7 +86,8 @@ jobs:
           LB_IP=$(kubectl get svc traefik -o json --kubeconfig=kubeconfig | jq -r '.status.loadBalancer.ingress[0].ip')
           sudo bash -c 'echo $LB_IP xpert-services.eu >> /etc/hosts'
           #echo $LB_IP subdomain.xpert-services.eu >> /etc/hosts
-          [[ $(curl --insecure -vvI https://xpert-services.eu/tls 2>&1 | grep "Let's Encrypt") ]] &>/dev/null && echo "App reachable with valide TLS certificate" || echo "App is not reachable with valide TLS certificate"
+          [[ $(curl --insecure -vvI https://xpert-services.eu/tls 2>&1 | grep "Let's Encrypt") ]] &>/dev/null && echo "App reachable with valide TLS certificate"\
+          || echo "App is not reachable with valide TLS certificate"
   # Remove all rbac manifests
   clean:
     runs-on: self-hosted
@@ -96,11 +101,12 @@ jobs:
           ./kubectl delete ns metallb-system --kubeconfig=kubeconfig
           echo Removing Traefik resources
           #./kubectl delete $(ls ${MANIFESTS}traefik*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
-          ./kubectl delete secret do-auth-token
+          ./kubectl delete secret do-auth-token --kubeconfig=kubeconfig
           echo Removing hosts records
           sudo sed -i '/xpert-services.eu$/d' /etc/hosts
   slack:
     runs-on: self-hosted
+    needs: clean
     steps:
       - name: Report Status
         if: always()
