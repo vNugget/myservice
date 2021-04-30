@@ -1,5 +1,4 @@
 # This is a WIP
-
 # jq need to be installed on the runner
 
 name: CICD
@@ -21,7 +20,6 @@ env:
   METALLB_VERSION: "v0.9.6"
 ############### End var config############
 
-  K8S_API_VERSION: "1.17.0" 
 jobs:
   # Download, install and configure Kubectl
   prepare:    
