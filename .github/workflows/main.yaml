@@ -73,7 +73,7 @@ jobs:
           ./kubectl apply $(ls ${MANIFESTS}traefik-{d*,i*,s*}.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
       - name: Apply yaml manifests
         run: |
-          echo Applying yaml manifests
+          echo Applying yaml rbac manifests
           ./kubectl apply $(ls ${MANIFESTS}rbac*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
   # Test app deployment
   testing:
@@ -85,10 +85,11 @@ jobs:
           echo Testing if app is reachable
           LB_IP=$(./kubectl get svc traefik -o json --kubeconfig=kubeconfig | jq -r '.status.loadBalancer.ingress[0].ip')
           sudo bash -c 'echo '$LB_IP' xpert-services.eu >> /etc/hosts'
-          #echo $LB_IP subdomain.xpert-services.eu >> /etc/hosts
+          sudo bash -c 'echo '$LB_IP' subdomain.xpert-services.eu >> /etc/hosts'
           sleep 30
-          curl --insecure -H "Host: xpert-services.eu" -vvI https://xpert-services.eu/tls
+          #curl --insecure -H "Host: xpert-services.eu" -vvI https://xpert-services.eu/tls
           [[ $(curl --insecure -vvI https://xpert-services.eu/tls 2>&1 | grep "Let's Encrypt") ]] &>/dev/null && echo "App is reachable with valide TLS certificate" || echo "::warning:: App is not reachable with valide TLS certificate"
+# Dev cycle start from here
   # Remove all manifests
   clean:
     runs-on: self-hosted
@@ -124,5 +125,6 @@ jobs:
   #./kubectl delete $(ls manifests/*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
   #./kubectl --kubeconfig=kubeconfig  delete ns metallb-system
   #./kubectl --kubeconfig=kubeconfig  delete secret do-auth-token
+  #sudo sed -i '/xpert-services.eu$/d' /etc/hosts
 
 
