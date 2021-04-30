@@ -86,6 +86,7 @@ jobs:
           LB_IP=$(./kubectl get svc traefik -o json --kubeconfig=kubeconfig | jq -r '.status.loadBalancer.ingress[0].ip')
           sudo bash -c 'echo '$LB_IP' xpert-services.eu >> /etc/hosts'
           #echo $LB_IP subdomain.xpert-services.eu >> /etc/hosts
+          curl --insecure -vvI https://xpert-services.eu/tls 2>&1
           [[ $(curl --insecure -vvI https://xpert-services.eu/tls 2>&1 | grep "Let's Encrypt") ]] &>/dev/null && echo "App is reachable with valide TLS certificate" || echo "::warning:: App is not reachable with valide TLS certificate"
           exit 1
   # Remove all manifests
