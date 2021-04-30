@@ -41,7 +41,7 @@ jobs:
           wget https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz
           tar xf kubeval-linux-amd64.tar.gz;rm -f kubeval-linux-amd64.tar.gz
           echo Validating manifests using Kubeval
-          ./kubeval --ignore-missing-schemas --kubernetes-version $K8S_API_VERSION manifests/rbac*.yaml
+          ./kubeval --ignore-missing-schemas --kubernetes-version $K8S_API_VERSION manifests/*.yaml
   # Apply all rbac manifests
   apply:
     runs-on: self-hosted
@@ -56,7 +56,7 @@ jobs:
       - name: Install configure Metallb
         run: |
           echo configure and install Metallb
-          sed -i 's@<CIDR>@'$(cat config.json | jq -r .metallb.cidr)'@g' ${MANIFESTS}metallb-configmap.yaml
+          sed -i 's@<CIDR>@'$(cat ${MANIFESTS}config.json | jq -r .metallb.cidr)'@g' ${MANIFESTS}metallb-configmap.yaml
           ./kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/$METALLB_VERSION/manifests/namespace.yaml --kubeconfig=kubeconfig
           ./kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/$METALLB_VERSION/manifests/metallb.yaml --kubeconfig=kubeconfig
           ./kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)" --kubeconfig=kubeconfig
@@ -94,7 +94,7 @@ jobs:
           ./kubectl delete $(ls ${MANIFESTS}rbac*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
           echo Removing Metallb resources
           ./kubectl delete ns metallb-system --kubeconfig=kubeconfig
-          echo Removing Trefik resources
+          echo Removing Traefik resources
           ./kubectl apply $(ls ${MANIFESTS}traefik*.yaml | awk ' { print " -f " $1 } ') --kubeconfig=kubeconfig
           ./kubectl delete secret do-auth-token
           echo Removing hosts records
