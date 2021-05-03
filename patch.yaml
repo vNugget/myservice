@@ -1,0 +1,13 @@
+spec:
+ template:
+    spec:
+      shareProcessNamespace: true
+      containers:
+      - name: shell
+        image: busybox
+        securityContext:
+          capabilities:
+            add:
+            - SYS_PTRACE
+        stdin: true
+        tty: true
