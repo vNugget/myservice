@@ -1,5 +1,5 @@
 # This is a WIP
-# jq need to be installed on the runner
+# jq need to be installed on the runner 
 
 name: CICD
 on:
