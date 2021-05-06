@@ -1,7 +1,7 @@
 # consulting-pracdev-karbon-fasttrack
 Xpert Services Practice Development repository for the Karbon FastTrack Services Offering
 
-Consultants, start [here](https://github.com/nutanixservices/cita-ft-karbon/blob/nx-sbourdeaud_SDCD-2632/doc/_how-to-guide.md "here")
+Consultants, start [here](/doc/_how-to-guide.md "here")
 
 |  useful stuff  |
 |----------------|
